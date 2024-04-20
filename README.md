@@ -1,4 +1,4 @@
-[](guidance.png)
+<img src="guidance.png" alt="miscon" width="200" height="200"/>
 
 # Miscon
 PowerShell script to find misconfigurations in an active directory and can be used for domain password sprays.
