@@ -221,6 +221,8 @@ function Find-Misconfigurations {
         } else {
             Write-Host "[!] LLMNR is enabled. Should be deactivated." -ForegroundColor Red
         }
+
+				# request certificate templates with certutil
     }
 }
 
