@@ -5,6 +5,7 @@ PowerShell script to find misconfigurations in an active directory and can be us
 
 ## Functions
 ### Find-Misconfigurations
+Find misconfigurations in an active directory.
 
 ```PowerShell
 -Domain = defines the domain
@@ -20,6 +21,7 @@ Find-Misconfigurations -Domain "test.local" -Type "quickwins"
 
 ### DomainPasswordSpray
 All Credits goes to dafthack, copied his DomainPasswordSpray PowerShell script, because it is awesome.
+Perform domain password spray attacks.
 
 ```PowerShell
 # single password spray
@@ -33,4 +35,11 @@ Invoke-DomainPasswordSpray -UserList users.txt -Domain domain-name -Password Sum
 
 # creating userlist out of the domain
 Get-DomainUserList -Domain domainname -RemoveDisabled -RemovePotentialLockouts | Out-File -Encoding ascii userlist.txt
+```
+
+### Invoke-CheckLocalAdmin
+Function to check a user against a list of hosts, if the user has local admin privileges.
+
+```PowerShell
+Invoke-CheckLocalAdmin -user john -hosts C:\Users\user1\Downloads\hosts.txt
 ```
