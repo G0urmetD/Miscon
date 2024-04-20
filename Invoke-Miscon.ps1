@@ -796,3 +796,62 @@ function Get-ObservationWindow($DomainEntry)
     $observation_window = $DomainEntry.ConvertLargeIntegerToInt64($lockObservationWindow_attr.Value) / -600000000
     return $observation_window
 }
+
+function Invoke-CheckLocalAdmin {
+    <#
+    .DESCRIPTION
+        Script to check, which user has local admin access to a host in the network.
+    .EXAMPLE
+        Invoke-CheckLocalAdmin.ps1 -user svc-test -hosts hosts.txt
+    #>
+
+    param(
+        [string]$user,
+        [string[]]$hosts
+    )
+
+    # read variables
+    $hosts = Get-Content -Path $hosts
+    Write-Host "# ========== Input check" -ForegroundColor Cyan
+    Write-Host "[>] Following hosts were provided: $hosts" -ForegroundColor Yellow
+
+    if($user -and $hosts)
+    {
+        Write-Host "[+] User account and hosts are provided." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "# ========== Check if Hosts are alive" -ForegroundColor Cyan
+        foreach($hest in $hosts)
+        {
+            $test = tnc $hest -InformationLevel Quiet
+
+            if($test.PingSucceeded -eq "True")
+            {
+                Write-Host "[+] $hest is reachable." -ForegroundColor Green
+                $hosta += $test.ComputerName
+            }
+        }
+
+        Write-Host "# ========== Check Local Admin" -ForegroundColor Cyan
+        
+        try {
+            foreach($hosta in $hosts)
+            {
+                # get members of the Administrator group
+                $localAdmins = Get-WmiObject -Class Win32_Group -Filter "Name='Administratoren'" -ComputerName $hosta
+                $members = $localAdmins.GetRelated("Win32_UserAccount") | Select-Object -ExpandProperty Name
+
+                if($members -contains $user)
+                {
+                    Write-Host "[+] $user has local admin privileges on $hosta" -ForegroundColor Green
+                } else {
+                    Write-Host "[-] $user has NOT local admin privileges on $hosta" -ForegroundColor Red
+                }
+
+            }
+        } catch {
+            Write-Host "[x] Error: Not able to check $user on $hosta : $_" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "[x] Please provide a valid username and a list of hosts." -ForegroundColor Red
+    }
+}
