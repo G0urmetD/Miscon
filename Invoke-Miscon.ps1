@@ -59,6 +59,18 @@ function SecurityGroups {
         Write-Host -ForegroundColor Red "[x]" -NoNewline
         Write-Host " No supported langugage detected."   
     }
+    Write-Output "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"
+    # group members of Enterprise Admins
+    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
+    Write-Host " Group Members of Administrators:"
+    if($languagepack -eq "de-DE") {
+        Get-ADGroupMember 'Administratoren' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } elseif ($languagepack -eq "en-EN") {
+        Get-ADGroupMember 'Administrators' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } else {
+        Write-Host -ForegroundColor Red "[x]" -NoNewline
+        Write-Host " No supported langugage detected."   
+    }
 }
 
 function Find-Misconfigurations {
