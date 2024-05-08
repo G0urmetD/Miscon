@@ -15,6 +15,10 @@
     [optional] Starts searching for basic misconfigurations.
 .PARAMETER quick
     [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
+.PARAMETER pndc
+    Checks if the spooler service is running on the domain controllers.
+.PARAMETER pnou
+    Checks if the spooler service is running on servers in target OU.
 #>
 
 param(
@@ -37,7 +41,13 @@ param(
     [switch]$basic,
 
     [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.")]
-    [switch]$quick
+    [switch]$quick,
+
+    [Parameter(HelpMessage = "Checks if the spooler service is running on the domain controllers.")]
+    [switch]$pndc,
+
+    [Parameter(HelpMessage = "Checks if the spooler service is running on servers in target OU.")]
+    [switch]$pnou
 )
 
 # import of modules
@@ -48,7 +58,7 @@ Import-Module ".\modules\basic-misconfigurations.psm1" -Force
 if($help) {
     Show-Banner
     Write-Output "[INFO] Here is some help ..."
-    Write-Output "Usage: Miscon.ps1 -d <domain> [-u <username>] [-p <password>] [-h]"
+    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]"
     Write-Output "Parameters:"
     Write-Output "-d, -domain              Defines the Active Directory domain. [required]"
     Write-Output "-u, -username            Defines the Active Directory username. [optional]"
@@ -56,6 +66,8 @@ if($help) {
     Write-Output "-i, -info                Starts Basic Domain Information Enumeration [Optional]"
     Write-Output "-b, -basic               Starts searching for basic misconfigurations [Optional]"
     Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
+    Write-Output "-pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]"
+    Write-Output "-pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]"
     exit
 }
 
@@ -198,4 +210,17 @@ if($quick) {
     $llmnrCheck = Test-LLMNR
     $llmnrCheck | Format-Table
     Write-Output ""
+}
+
+if($pndc) {
+    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+    Write-Host " Checks if the spooler service is running on the domain controllers ..."
+    $PrintNightmareDC = Test-PrintNightmareDC
+    $PrintNightmareDC | Format-Table
+}
+
+if($pnou) {
+    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+    Write-Host " Checks if the spooler service is running on servers in target OU ..."
+    Test-PrintNightmareOU | Format-Table
 }
