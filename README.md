@@ -1,47 +1,26 @@
 <img src="guidance.png" alt="miscon" width="200" height="200"/>
 
 # Miscon
-- find Active Directory misconfigurations (quickwins for Pentesting)
-- Domain password spray
-- Local Admin check
+Modular PowerShell Tool to display domain information, find basic & advanced misconfigurations and other cool stuff.
 
-## Functions
-### Find-Misconfigurations
-Find misconfigurations in an active directory.
+```powershell
+    ___  ____
+    |  \/  (_)
+    | .  . |_ ___  ___ ___  _ __
+    | |\/| | / __|/ __/ _ \| '_ \
+    | |  | | \__ \ (_| (_) | | | |
+    \_|  |_/_|___/\___\___/|_| |_|
 
-```PowerShell
--Domain = defines the domain
--Type = defines the type (default = light | other types: extended, quickwins)
-```
+    Author = G0urmetD
+    version = 1.4.3
 
-```PowerShell
-Find-Misconfigurations -Domain "test.local"
-Find-Misconfigurations -Domain "test.local" -Type "light"
-Find-Misconfigurations -Domain "test.local" -Type "extended"
-Find-Misconfigurations -Domain "test.local" -Type "quickwins"
-```
-
-### DomainPasswordSpray
-All Credits goes to dafthack, copied his DomainPasswordSpray PowerShell script, because it is awesome.
-Perform domain password spray attacks.
-
-```PowerShell
-# single password spray
-Invoke-DomainPasswordSpray -Password Spring2017
-
-# uses userlist and passwordlist, creating outfile
-Invoke-DomainPasswordSpray -UserList users.txt -Domain domain-name -PasswordList passlist.txt -OutFile sprayed-creds.txt
-
-# using userlist and one password, creating outfile
-Invoke-DomainPasswordSpray -UserList users.txt -Domain domain-name -Password Summer2017 -OutFile sprayed-creds.txt
-
-# creating userlist out of the domain
-Get-DomainUserList -Domain domainname -RemoveDisabled -RemovePotentialLockouts | Out-File -Encoding ascii userlist.txt
-```
-
-### Invoke-CheckLocalAdmin
-Function to check a user against a list of hosts, if the user has local admin privileges.
-
-```PowerShell
-Invoke-CheckLocalAdmin -user john -hosts C:\Users\user1\Downloads\hosts.txt
+[INFO] Here is some help ...
+Usage: Miscon.ps1 -d <domain> [-u <username>] [-p <password>] [-h]
+Parameters:
+-d, -domain              Defines the Active Directory domain. [required]
+-u, -username            Defines the Active Directory username. [optional]
+-p, -password            Defines the Active Directory user password. [optional]
+-i, -info                Starts Basic Domain Information Enumeration [Optional]
+-b, -basic               Starts searching for basic misconfigurations [Optional]
+-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR
 ```
