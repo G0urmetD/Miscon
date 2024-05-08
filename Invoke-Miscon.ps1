@@ -19,6 +19,8 @@
     Checks if the spooler service is running on the domain controllers.
 .PARAMETER pnou
     Checks if the spooler service is running on servers in target OU.
+.PARAMETER dacl
+    Checks for custom domain acls.
 #>
 
 param(
@@ -47,7 +49,10 @@ param(
     [switch]$pndc,
 
     [Parameter(HelpMessage = "Checks if the spooler service is running on servers in target OU.")]
-    [switch]$pnou
+    [switch]$pnou,
+
+    [Parameter(HelpMessage = "Checks for custom domain acls on not built-in objects.")]
+    [switch]$dacl
 )
 
 # import of modules
@@ -57,6 +62,7 @@ Import-Module ".\modules\basic-misconfigurations.psm1" -Force
 Import-Module ".\modules\quickwins.psm1" -Force
 Import-Module ".\modules\printNightmare-DC.psm1" -Force
 Import-Module ".\modules\printNightmware-OU.psm1" -Force
+Import-Module ".\modules\domainacls.psm1" -Force
 
 if($help) {
     Show-Banner
@@ -71,6 +77,7 @@ if($help) {
     Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
     Write-Output "-pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]"
     Write-Output "-pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]"
+    Write-Output "-dacl, -dacl             Checks for custom domain acls on not built-in objects. [Optional]"
     exit
 }
 
@@ -220,10 +227,21 @@ if($pndc) {
     Write-Host " Checks if the spooler service is running on the domain controllers ..."
     $PrintNightmareDC = Test-PrintNightmareDC
     $PrintNightmareDC | Format-Table
+    Write-Output ""
 }
 
 if($pnou) {
     Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
     Write-Host " Checks if the spooler service is running on servers in target OU ..."
     Test-PrintNightmareOU | Format-Table
+    Write-Output ""
+}
+
+if($dacl) {
+    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+    Write-Host " Checks for custom domain acls on not built-in objects. ..."
+    # choose wisely
+    Test-DomainACLs
+    Test-DomainACLsSID
+    Write-Output ""
 }
