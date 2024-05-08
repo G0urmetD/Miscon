@@ -7,7 +7,7 @@ function Show-Banner {
     #>
 
     param(
-        [string]$version = "1.3.3"
+        [string]$version = "1.4.4"
     )
 
     Write-Output "
