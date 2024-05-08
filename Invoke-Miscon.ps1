@@ -15,7 +15,10 @@ param(
     [switch]$info,
 
     [Parameter(HelpMessage = "Starts searching for basic misconfigurations.")]
-    [switch]$basic
+    [switch]$basic,
+
+    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR")]
+    [switch]$quick
 )
 
 # import of modules
@@ -33,6 +36,7 @@ if($help) {
     Write-Output "-p, -password            Defines the Active Directory user password. [optional]"
     Write-Output "-i, -info                Starts Basic Domain Information Enumeration [Optional]"
     Write-Output "-b, -basic               Starts searching for basic misconfigurations [Optional]"
+    Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
     exit
 }
 
@@ -122,5 +126,57 @@ if($basic) {
     Write-Host " Check when AD administrator password last set ..."
     $ADAdministratorPWLastSet = Test-ADAdministrator
     $ADAdministratorPWLastSet
+    Write-Output ""
+
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Check User credentials which be used for Kerberos delegation ..."
+    $kerberosDelegatable = Test-AccountDelegation
+    $kerberosDelegatable
+    Write-Output ""
+
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Check User credentials which cannot be used for Kerberos delegation ..."
+    $NokerberosDelegatable = Test-NoAccountDelegation
+    $NokerberosDelegatable
+    Write-Output ""
+
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Checking if users have admincount greater than 0 and Kerberos Delegation activated ..."
+    $admincount = Test-AdminDelegation
+    $admincount | Format-Table
+    Write-Output ""
+
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Never changing a bad password is bad for the whole Domain, especially Service Accounts. ..."
+    $pwNeverExpires = Test-PWNeverExpires
+    $pwNeverExpires | Format-Table
+    Write-Output ""
+
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Checking Security group members ..."
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Some groups should be empty ..."
+    $securityGroups = Test-SecurityGroups
+    $securityGroups | Format-Table
+    Write-Output ""
+}
+
+if($quick) {
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Checking for AS-REP Roasting ..."
+    $ASREPROASTING = Test-ASREPRoasting
+    $ASREPROASTING | Format-Table
+    Write-Output ""
+
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Checking for AS-REP Roasting ..."
+    $kerberoastableAccounts = Test-KerberoastableAccounts
+    $kerberoastableAccounts | Format-Table
+    Write-Output ""
+
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Checking for LLMNR ..."
+    $llmnrCheck = Test-LLMNR
+    $llmnrCheck | Format-Table
     Write-Output ""
 }
