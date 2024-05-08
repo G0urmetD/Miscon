@@ -6,14 +6,14 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
 ```powershell
     ___  ____
     |  \/  (_)
-    | .  . |_ ___  ___ ___  _ __  
-    | |\/| | / __|/ __/ _ \| '_ \ 
+    | .  . |_ ___  ___ ___  _ __
+    | |\/| | / __|/ __/ _ \| '_ \
     | |  | | \__ \ (_| (_) | | | |
     \_|  |_/_|___/\___\___/|_| |_|
-    
+
     Author = G0urmetD
-    version = 1.3.5
-    
+    version = 1.4.3
+
 [INFO] Here is some help ...
 Usage: Miscon.ps1 -d <domain> [-u <username>] [-p <password>] [-h]
 Parameters:
@@ -22,12 +22,5 @@ Parameters:
 -p, -password            Defines the Active Directory user password. [optional]
 -i, -info                Starts Basic Domain Information Enumeration [Optional]
 -b, -basic               Starts searching for basic misconfigurations [Optional]
-```
-
-## Examples
-```powershell
-.\miscon.ps1 -d <domain> -info
-.\miscon.ps1 -d <domain> -basic
-
-.\miscon.ps1 -d <domain> -info -basic
+-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR
 ```
