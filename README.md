@@ -12,7 +12,7 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     \_|  |_/_|___/\___\___/|_| |_|
     
     Author = G0urmetD
-    version = 1.5.2
+    version = 1.6.2
     
 [INFO] Here is some help ...
 Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
@@ -25,4 +25,5 @@ Parameters:
 -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR
 -pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]
 -pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]
+-dacl, -dacl             Checks for custom domain acls on not built-in objects. [Optional]
 ```
