@@ -54,6 +54,9 @@ param(
 Import-Module ".\modules\banner.psm1" -Force
 Import-Module ".\modules\domainInfo.psm1" -Force
 Import-Module ".\modules\basic-misconfigurations.psm1" -Force
+Import-Module ".\modules\quickwins.psm1" -Force
+Import-Module ".\modules\printNightmare-DC.psm1" -Force
+Import-Module ".\modules\printNightmware-OU.psm1"
 
 if($help) {
     Show-Banner
