@@ -12,7 +12,7 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     \_|  |_/_|___/\___\___/|_| |_|
 
     Author = G0urmetD
-    version = 1.4.4
+    version = 1.4.6
 
 [INFO] Here is some help ...
 Usage: Invoke-Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
