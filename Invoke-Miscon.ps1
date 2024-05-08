@@ -2,19 +2,19 @@
 .DESCRIPTION
     The Miscon tool can identify basic misconfigurations and quick wins from an IT security perspective.
 .PARAMETER help
-    Shows the help for young padawans.
+    [optional] Shows the help for young padawans.
 .PARAMETER domain
-    Defines the Active Directory domain.
+    [required] Defines the Active Directory domain.
 .PARAMETER username
-    Defines the Active Directory username.
+    [optional] Defines the Active Directory username.
 .PARAMETER password
-    Defines the Active Directory password.
+    [optional] Defines the Active Directory password.
 .PARAMETER info
-    Starts Basic Domain Information Enumeration.
+    [optional] Starts Basic Domain Information Enumeration.
 .PARAMETER basic
-    Starts searching for basic misconfigurations.
+    [optional] Starts searching for basic misconfigurations.
 .PARAMETER quick
-    Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
+    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
 #>
 
 param(
