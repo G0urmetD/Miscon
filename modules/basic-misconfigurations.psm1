@@ -59,3 +59,88 @@ function Test-ADAdministrator {
         $adadminPasswordLastSet | Format-Table
     }
 }
+
+function Test-AccountDelegation {
+    $kerberosDelegation = Get-ADUser -Filter {AccountNotDelegated -eq $false} | Format-Table sAMAccountName,DistinguishedName,AccountNotDelegated    # User credentials can be used for Kerberos delegation
+    
+    if($kerberosDelegation) {
+        $kerberosDelegation | Format-Table
+    }
+}
+
+function Test-NoAccountDelegation {
+    $NokerberosDelegation = Get-ADUser -Filter {AccountNotDelegated -eq $true} | Format-Table sAMAccountName,DistinguishedName,AccountNotDelegated # User credentials cannot be used for Kerberos delegation
+
+    if($NokerberosDelegation) {
+        $NokerberosDelegation | Format-Table
+    }
+}
+
+function Test-AdminDelegation {
+    $admincountKerberosDelegation = Get-ADUser -Filter {(AdminCount -eq 1) -and (AccountNotDelegated -eq $false)} | Format-Table sAMAccountName,DistinguishedName,AccountNotDelegated
+
+    if($admincountKerberosDelegation) {
+        $admincountKerberosDelegation | Format-Table
+    }
+}
+
+function Test-PWNeverExpires {
+    $pwNeverExpires = Get-ADUser -filter * -properties Name, PasswordNeverExpires | Where-Object { $_.passwordNeverExpires -eq "true" } |  Select-Object DistinguishedName,Name,Enabled,PasswordNeverExpires | Format-Table
+
+    if($pwNeverExpires) {
+        $pwNeverExpires | Format-Table
+    }
+}
+
+function Test-SecurityGroups {
+    $OSInfo = Get-WmiObject -Class Win32_OperatingSystem
+    $languagepack = $OSInfo.MUILanguages
+
+    # Get group members of DNSAdmins
+    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
+    Write-Host " Group Members of DNSAdmins:"
+    if($languagepack -eq "de-DE") {
+        Get-ADGroupMember 'DnsAdmins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } elseif ($languagepack -eq "en-EN") {
+        Get-ADGroupMember 'DNSAdmins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } else {
+        Write-Host -ForegroundColor Red "[x]" -NoNewline
+        Write-Host " No supported langugage detected."   
+    }
+
+    # Get group members of Schema-Admins
+    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
+    Write-Host " Group Members of Schema-Admins:"
+    if($languagepack -eq "de-DE") {
+        Get-ADGroupMember 'Schema-Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } elseif ($languagepack -eq "en-EN") {
+        Get-ADGroupMember 'Schema Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } else {
+        Write-Host -ForegroundColor Red "[x]" -NoNewline
+        Write-Host " No supported langugage detected."   
+    }
+
+    # Get group members of Enterprise Admins
+    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
+    Write-Host " Group Members of Enterprise-Admins/Organisations-Admins:"
+    if($languagepack -eq "de-DE") {
+        Get-ADGroupMember 'Organisations-Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } elseif ($languagepack -eq "en-EN") {
+        Get-ADGroupMember 'Enterprise Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } else {
+        Write-Host -ForegroundColor Red "[x]" -NoNewline
+        Write-Host " No supported langugage detected."   
+    }
+
+    # Get group members of Enterprise Admins
+    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
+    Write-Host " Group Members of Administrators:"
+    if($languagepack -eq "de-DE") {
+        Get-ADGroupMember 'Administratoren' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } elseif ($languagepack -eq "en-EN") {
+        Get-ADGroupMember 'Administrators' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
+    } else {
+        Write-Host -ForegroundColor Red "[x]" -NoNewline
+        Write-Host " No supported langugage detected."   
+    }
+}
