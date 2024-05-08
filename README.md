@@ -12,10 +12,10 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     \_|  |_/_|___/\___\___/|_| |_|
 
     Author = G0urmetD
-    version = 1.4.3
+    version = 1.4.4
 
 [INFO] Here is some help ...
-Usage: Miscon.ps1 -d <domain> [-u <username>] [-p <password>] [-h]
+Usage: Invoke-Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
 Parameters:
 -d, -domain              Defines the Active Directory domain. [required]
 -u, -username            Defines the Active Directory username. [optional]
