@@ -1,5 +1,5 @@
 param(
-    [Parameter(HelpMessage = "Show Help for young padawans.")]    
+    [Parameter(HelpMessage = "Shows the help for young padawans.")]    
     [switch]$help,
 
     [Parameter(HelpMessage = "Defines the Active Directory domain.")]
