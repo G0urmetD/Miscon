@@ -1,3 +1,22 @@
+<#
+.DESCRIPTION
+    The Miscon tool can identify basic misconfigurations and quick wins from an IT security perspective.
+.PARAMETER help
+    Shows the help for young padawans.
+.PARAMETER domain
+    Defines the Active Directory domain.
+.PARAMETER username
+    Defines the Active Directory username.
+.PARAMETER password
+    Defines the Active Directory password.
+.PARAMETER info
+    Starts Basic Domain Information Enumeration.
+.PARAMETER basic
+    Starts searching for basic misconfigurations.
+.PARAMETER quick
+    Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
+#>
+
 param(
     [Parameter(HelpMessage = "Shows the help for young padawans.")]    
     [switch]$help,
@@ -11,13 +30,13 @@ param(
     [Parameter(HelpMessage = "Defines the Active Directory password.")]
     [string]$password,
 
-    [Parameter(HelpMessage = "Starts Basic Domain Information Enumeration")]
+    [Parameter(HelpMessage = "Starts Basic Domain Information Enumeration.")]
     [switch]$info,
 
     [Parameter(HelpMessage = "Starts searching for basic misconfigurations.")]
     [switch]$basic,
 
-    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR")]
+    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.")]
     [switch]$quick
 )
 
