@@ -97,8 +97,7 @@ function Test-SecurityGroups {
     $languagepack = $OSInfo.MUILanguages
 
     # Get group members of DNSAdmins
-    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
-    Write-Host " Group Members of DNSAdmins:"
+    Write-Output "[INFO] Group Members of DNSAdmins"
     if($languagepack -eq "de-DE") {
         Get-ADGroupMember 'DnsAdmins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
     } elseif ($languagepack -eq "en-EN") {
@@ -109,8 +108,7 @@ function Test-SecurityGroups {
     }
 
     # Get group members of Schema-Admins
-    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
-    Write-Host " Group Members of Schema-Admins:"
+    Write-Output "[INFO] Group Members of Schema-Admins"
     if($languagepack -eq "de-DE") {
         Get-ADGroupMember 'Schema-Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
     } elseif ($languagepack -eq "en-EN") {
@@ -121,8 +119,7 @@ function Test-SecurityGroups {
     }
 
     # Get group members of Enterprise Admins
-    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
-    Write-Host " Group Members of Enterprise-Admins/Organisations-Admins:"
+    Write-Output "[INFO] Group Members of Enterprise-Admins/Organisations-Admins"
     if($languagepack -eq "de-DE") {
         Get-ADGroupMember 'Organisations-Admins' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
     } elseif ($languagepack -eq "en-EN") {
@@ -133,8 +130,7 @@ function Test-SecurityGroups {
     }
 
     # Get group members of Enterprise Admins
-    Write-Host -ForegroundColor Yellow "[*]" -NoNewline
-    Write-Host " Group Members of Administrators:"
+    Write-Output "[INFO] Group Members of Administrators"
     if($languagepack -eq "de-DE") {
         Get-ADGroupMember 'Administratoren' | Select-Object Name,SamAccountName,distinguishedName,SID | Format-Table
     } elseif ($languagepack -eq "en-EN") {
