@@ -7,10 +7,10 @@ function Show-Banner {
     #>
 
     param(
-        [string]$version = "1.6.12"
+        [string]$version = "1.6.13"
     )
 
-    Write-Output "
+    Write-Host "
     ___  ____                     
     |  \/  (_)                    
     | .  . |_ ___  ___ ___  _ __  
@@ -18,6 +18,8 @@ function Show-Banner {
     | |  | | \__ \ (_| (_) | | | |
     \_|  |_/_|___/\___\___/|_| |_|
     
+    " -ForegroundColor DarkMagenta
+    Write-Output "
     Author = G0urmetD
     version = $version
     "
