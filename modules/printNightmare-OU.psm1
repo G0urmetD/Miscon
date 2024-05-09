@@ -1,7 +1,7 @@
 function Test-PrintNightmareOU {
     
     param(
-        [Parameter(Mandatory = $true, HelpMessage = "Defines target OU.")]
+        [Parameter(Mandatory = $false, HelpMessage = "Defines target OU.")]
         [string]$searchbase
     )
 
