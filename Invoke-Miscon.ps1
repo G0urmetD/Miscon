@@ -80,7 +80,9 @@ if($help) {
     Show-Banner
     Write-Output "[INFO] Here is some help ..."
     Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>]"
+    Write-Output ""
     Write-Output "Parameters:"
+    Write-Output "------------------------------------------------------------------------------------------------------------------"
     Write-Output "-d, -domain              Defines the Active Directory domain. [required]"
     Write-Output "-i, -info                Starts Basic Domain Information Enumeration [Optional]"
     Write-Output "-b, -basic               Starts searching for basic misconfigurations [Optional]"
