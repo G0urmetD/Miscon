@@ -12,13 +12,13 @@
 .PARAMETER quick
     [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
 .PARAMETER pndc
-    Checks if the spooler service is running on the domain controllers.
+    [optional] Checks if the spooler service is running on the domain controllers.
 .PARAMETER pnou
-    Checks if the spooler service is running on servers in target OU.
+    [optional] Checks if the spooler service is running on servers in target OU.
 .PARAMETER searchbase
-    Defines ou path for pnou parameter.
+    [optional] Defines ou path for pnou parameter.
 .PARAMETER dacl
-    Checks for custom domain acls.
+    [optional] Checks for custom domain acls.
 .PARAMETER username
     [optional] Defines the Active Directory username.
 .PARAMETER password
