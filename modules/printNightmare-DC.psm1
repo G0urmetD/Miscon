@@ -13,7 +13,7 @@ function Test-PrintNightmareDC {
             }
             $Object = New-Object PSObject -Property @{
                 DomainController = $DomainController
-                Serivce = $result.Name
+                Service = $result.Name
                 State = $result.Status
             }
             $DCS += $Object
@@ -28,7 +28,7 @@ function Test-PrintNightmareDC {
             }
             $Object = New-Object PSObject -Property @{
                 DomainController = $DomainController
-                Serivce = $result.Name
+                Service = $result.Name
                 State = $result.Status
             }
             $DCS += $Object
