@@ -19,6 +19,8 @@
     Checks if the spooler service is running on the domain controllers.
 .PARAMETER pnou
     Checks if the spooler service is running on servers in target OU.
+.PARAMETER searchbase
+    Defines ou path for pnou parameter.
 .PARAMETER dacl
     Checks for custom domain acls.
 #>
@@ -28,21 +30,27 @@ param(
     [switch]$help,
 
     [Parameter(HelpMessage = "Defines the Active Directory domain.")]
+    [Alias('d')]
     [string]$domain,
 
     [Parameter(HelpMessage = "Defines the Active Directory username.")]
+    [Alias('u')]
     [string]$username,
 
     [Parameter(HelpMessage = "Defines the Active Directory password.")]
+    [Alias('p')]
     [string]$password,
 
     [Parameter(HelpMessage = "Starts Basic Domain Information Enumeration.")]
+    [Alias('i')]
     [switch]$info,
 
     [Parameter(HelpMessage = "Starts searching for basic misconfigurations.")]
+    [Alias('b')]
     [switch]$basic,
 
     [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.")]
+    [Alias('q')]
     [switch]$quick,
 
     [Parameter(HelpMessage = "Checks if the spooler service is running on the domain controllers.")]
@@ -52,7 +60,11 @@ param(
     [switch]$pnou,
 
     [Parameter(HelpMessage = "Checks for custom domain acls on not built-in objects.")]
-    [switch]$dacl
+    [switch]$dacl,
+
+    [Parameter(HelpMessage = "Defines ou path for pnou parameter.")]
+    [Alias('sb')]
+    [switch]$searchbase
 )
 
 # import of modules
@@ -77,6 +89,7 @@ if($help) {
     Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
     Write-Output "-pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]"
     Write-Output "-pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]"
+    Write-Output "  -sb, -searchbase         Defines ou path for pnou parameter. [Optional]"
     Write-Output "-dacl, -dacl             Checks for custom domain acls on not built-in objects. [Optional]"
     exit
 }
@@ -90,7 +103,7 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
 
 Show-Banner
 
-if($info) {
+if($i -or $info) {
     # call domainInfo function from domainInfo module
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
     Write-Host " Fetching Domain information ..."
@@ -110,7 +123,7 @@ if($info) {
     Write-Output ""
 }
 
-if($basic) {
+if($b -or $basic) {
     # call Test-DefaultDomainPasswordPolicy function from basic-misconfigurations module
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
     Write-Host " Searching for basic misconfigurations ..."
@@ -202,7 +215,7 @@ if($basic) {
     Write-Output ""
 }
 
-if($quick) {
+if($q -or $quick) {
     Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
     Write-Host " Checking for AS-REP Roasting ..."
     $ASREPROASTING = Test-ASREPRoasting
@@ -227,14 +240,24 @@ if($pndc) {
     Write-Host " Checks if the spooler service is running on the domain controllers ..."
     $PrintNightmareDC = Test-PrintNightmareDC
     $PrintNightmareDC | Format-Table
+
+    if($PrintNightmareDC.State -eq "Running") {
+        Write-Host -ForegroundColor Red "[VULNERABLE]" -NoNewline
+        Write-Host " Your domain controller is vulnerable, spooler service is running ..."
+    }
     Write-Output ""
 }
 
 if($pnou) {
-    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
-    Write-Host " Checks if the spooler service is running on servers in target OU ..."
-    Test-PrintNightmareOU | Format-Table
-    Write-Output ""
+    if(-not ($searchbase -or $sb)) {
+        Write-Host -ForegroundColor Red "[ERROR]" -NoNewline
+        Write-Host " The -sb/-searchbase parameter is required when using -pnou. Use -h for further information. ..."
+    } else {
+        Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+        Write-Host " Checks if the spooler service is running on servers in target OU ..."
+        Test-PrintNightmareOU | Format-Table
+        Write-Output ""
+    }
 }
 
 if($dacl) {
