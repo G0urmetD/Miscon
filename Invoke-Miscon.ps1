@@ -61,7 +61,7 @@ Import-Module ".\modules\domainInfo.psm1" -Force
 Import-Module ".\modules\basic-misconfigurations.psm1" -Force
 Import-Module ".\modules\quickwins.psm1" -Force
 Import-Module ".\modules\printNightmare-DC.psm1" -Force
-Import-Module ".\modules\printNightmware-OU.psm1" -Force
+Import-Module ".\modules\printNightmare-OU.psm1" -Force
 Import-Module ".\modules\domainacls.psm1" -Force
 
 if($help) {
