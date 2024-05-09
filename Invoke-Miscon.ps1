@@ -5,10 +5,6 @@
     [optional] Shows the help for young padawans.
 .PARAMETER domain
     [required] Defines the Active Directory domain.
-.PARAMETER username
-    [optional] Defines the Active Directory username.
-.PARAMETER password
-    [optional] Defines the Active Directory password.
 .PARAMETER info
     [optional] Starts Basic Domain Information Enumeration.
 .PARAMETER basic
@@ -23,6 +19,10 @@
     Defines ou path for pnou parameter.
 .PARAMETER dacl
     Checks for custom domain acls.
+.PARAMETER username
+    [optional] Defines the Active Directory username.
+.PARAMETER password
+    [optional] Defines the Active Directory password.
 #>
 
 param(
@@ -32,14 +32,6 @@ param(
     [Parameter(HelpMessage = "Defines the Active Directory domain.")]
     [Alias('d')]
     [string]$domain,
-
-    [Parameter(HelpMessage = "Defines the Active Directory username.")]
-    [Alias('u')]
-    [string]$username,
-
-    [Parameter(HelpMessage = "Defines the Active Directory password.")]
-    [Alias('p')]
-    [string]$password,
 
     [Parameter(HelpMessage = "Starts Basic Domain Information Enumeration.")]
     [Alias('i')]
@@ -59,12 +51,20 @@ param(
     [Parameter(HelpMessage = "Checks if the spooler service is running on servers in target OU.")]
     [switch]$pnou,
 
+    [Parameter(HelpMessage = "Defines ou path for pnou parameter.")]
+    [Alias('sb')]
+    [switch]$searchbase,
+
     [Parameter(HelpMessage = "Checks for custom domain acls on not built-in objects.")]
     [switch]$dacl,
 
-    [Parameter(HelpMessage = "Defines ou path for pnou parameter.")]
-    [Alias('sb')]
-    [switch]$searchbase
+    [Parameter(HelpMessage = "Defines the Active Directory username.")]
+    [Alias('u')]
+    [string]$username,
+
+    [Parameter(HelpMessage = "Defines the Active Directory password.")]
+    [Alias('p')]
+    [string]$password
 )
 
 # import of modules
@@ -79,18 +79,18 @@ Import-Module ".\modules\domainacls.psm1" -Force
 if($help) {
     Show-Banner
     Write-Output "[INFO] Here is some help ..."
-    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]"
+    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>]"
     Write-Output "Parameters:"
     Write-Output "-d, -domain              Defines the Active Directory domain. [required]"
-    Write-Output "-u, -username            Defines the Active Directory username. [optional]"
-    Write-Output "-p, -password            Defines the Active Directory user password. [optional]"
     Write-Output "-i, -info                Starts Basic Domain Information Enumeration [Optional]"
     Write-Output "-b, -basic               Starts searching for basic misconfigurations [Optional]"
     Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
     Write-Output "-pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]"
     Write-Output "-pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]"
-    Write-Output "  -sb, -searchbase         Defines ou path for pnou parameter. [Optional]"
+    Write-Output "      -sb, -searchbase         Defines ou path for pnou parameter. [Optional]"
     Write-Output "-dacl, -dacl             Checks for custom domain acls on not built-in objects. [Optional]"
+    Write-Output "      -u, -username            Defines the Active Directory username. [optional]"
+    Write-Output "      -p, -password            Defines the Active Directory user password. [optional]"
     exit
 }
 
@@ -261,10 +261,6 @@ if($pnou) {
 }
 
 if($dacl) {
-    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
-    Write-Host " Checks for custom domain acls on not built-in objects. ..."
-    # choose wisely
-    Test-DomainACLs
-    Test-DomainACLsSID
-    Write-Output ""
+    # test ad credentials & if valid -> run custom dacl check
+    Test-ADCredentials -Username $userName -Password $password
 }
