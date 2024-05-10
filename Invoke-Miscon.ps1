@@ -214,15 +214,33 @@ if($b -or $basic) {
     Write-Output ""
 
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Check User credentials which be used for Kerberos delegation ..."
-    $kerberosDelegatable = Test-AccountDelegation
-    $kerberosDelegatable
+    Write-Host " Search for users with constrained delegation."
+    $testconstrainedDelegation = Test-ConstrainedDelegation
+    if(-not ($testconstrainedDelegation)) {
+        Write-Host -ForegroundColor Red "[SAD]" -NoNewline
+        Write-Host " Could not found users with constrained delegation."
+    } else {
+        Write-Host -ForegroundColor Green "[FOUND]" -NoNewline
+        Write-Host " Search process was successful."
+        Write-Host -ForegroundColor Cyan "[NOTE]" -NoNewline
+        Write-Host " A user or a service can pass on the Kerberos ticket of a client to another service without any restrictions."
+        $testconstrainedDelegation
+    }
     Write-Output ""
 
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Check User credentials which cannot be used for Kerberos delegation ..."
-    $NokerberosDelegatable = Test-NoAccountDelegation
-    $NokerberosDelegatable
+    Write-Host " Search for users with unconstrained delegation."
+    $testunconstrainedDelegation = Test-UnconstrainedDelegation
+    if(-not ($testunconstrainedDelegation)) {
+        Write-Host -ForegroundColor Red "[SAD]" -NoNewline
+        Write-Host " Could not found users with unconstrained delegation."
+    } else {
+        Write-Host -ForegroundColor Green "[FOUND]" -NoNewline
+        Write-Host " Search process was successful."
+        Write-Host -ForegroundColor Cyan "[NOTE]" -NoNewline
+        Write-Host " Delegation is restricted to certain services or resources to which a user or service may have access.."
+        $testunconstrainedDelegation
+    }
     Write-Output ""
 
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
