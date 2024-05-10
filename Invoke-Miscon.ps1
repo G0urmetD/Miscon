@@ -282,6 +282,12 @@ if($q -or $quick) {
     $llmnrCheck = Test-LLMNR
     $llmnrCheck | Format-Table
     Write-Output ""
+
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Checking for DCSync rights ..."
+    $dcsyncCheck = Test-DCSync
+    $dcsyncCheck
+    Write-Output ""
 }
 
 if($pndc) {
