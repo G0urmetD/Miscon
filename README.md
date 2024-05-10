@@ -35,4 +35,6 @@ Parameters:
 [Optional]    -g, -gpo                 Enumerate domain GPO's.
 [Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates.
 [Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates.
+
+
 ```
