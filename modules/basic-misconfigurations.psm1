@@ -60,19 +60,26 @@ function Test-ADAdministrator {
     }
 }
 
-function Test-AccountDelegation {
-    $kerberosDelegation = Get-ADUser -Filter {AccountNotDelegated -eq $false} | Format-Table sAMAccountName,DistinguishedName,AccountNotDelegated    # User credentials can be used for Kerberos delegation
-    
-    if($kerberosDelegation) {
-        $kerberosDelegation | Format-Table
+function Test-ConstrainedDelegation {
+    $users = Get-ADUser -LdapFilter "(&(userAccountControl:1.2.840.113556.1.4.803:=16777216)(msDS-AllowedToDelegateTo=*))"
+
+    foreach ($user in $users) {
+
+        Write-output
+        write-output($user.sAMAccountName)
+        Get-ADUser $user -Properties msDS-AllowedToDelegateTo,Displayname | Select-Object Displayname -ExpandProperty msDS-AllowedToDelegateTo | Format-Table
+        write-output("")
     }
 }
 
-function Test-NoAccountDelegation {
-    $NokerberosDelegation = Get-ADUser -Filter {AccountNotDelegated -eq $true} | Format-Table sAMAccountName,DistinguishedName,AccountNotDelegated # User credentials cannot be used for Kerberos delegation
+function Test-UnconstrainedDelegation {
+    $users = Get-ADUser -Filter "msDS-AllowedToDelegateTo -like '*'" -Properties msDS-AllowedToDelegateTo,userAccountControl | Where-Object { $_.Enabled -eq $true }
 
-    if($NokerberosDelegation) {
-        $NokerberosDelegation | Format-Table
+    foreach ($user in $users) {
+        Write-output("")
+        write-output($user.sAMAccountName)
+        Get-ADUser $user -Properties msDS-AllowedToDelegateTo,DisplayName | Select-Object DisplayName -ExpandProperty msDS-AllowedToDelegateTo | Format-List
+        write-output("")
     }
 }
 
