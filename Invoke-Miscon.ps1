@@ -64,7 +64,14 @@ param(
 
     [Parameter(HelpMessage = "Defines the Active Directory password.")]
     [Alias('p')]
-    [string]$password
+    [string]$password,
+
+    [Parameter(HelpMessage = "Starts GPO enumeration.")]
+    [Alias('g')]
+    [switch]$GPO,
+
+    [Parameter(HelpMessage = "GPO array.")]
+    [string[]]$domainGPOs
 )
 
 # import of modules
@@ -75,24 +82,26 @@ Import-Module ".\modules\quickwins.psm1" -Force
 Import-Module ".\modules\printNightmare-DC.psm1" -Force
 Import-Module ".\modules\printNightmare-OU.psm1" -Force
 Import-Module ".\modules\domainacls.psm1" -Force
+Import-Module ".\modules\gpo.psm1" -Force
 
 if($help) {
     Show-Banner
     Write-Output "[INFO] Here is some help ..."
-    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>]"
+    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-gpo]"
     Write-Output ""
     Write-Output "Parameters:"
     Write-Output "------------------------------------------------------------------------------------------------------------------"
-    Write-Output "-d, -domain              Defines the Active Directory domain. [required]"
-    Write-Output "-i, -info                Starts Basic Domain Information Enumeration [Optional]"
-    Write-Output "-b, -basic               Starts searching for basic misconfigurations [Optional]"
-    Write-Output "-q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR"
-    Write-Output "-pndc, -pndc             Checks if the spooler service is running on the domain controllers. [Optional]"
-    Write-Output "-pnou, -pnou             Checks if the spooler service is running on servers in target OU. [Optional]"
-    Write-Output "      -sb, -searchbase         Defines ou path for pnou parameter. [Optional]"
-    Write-Output "-dacl, -dacl             Checks for custom domain acls on not built-in objects. [Optional]"
-    Write-Output "      -u, -username            Defines the Active Directory username. [optional]"
-    Write-Output "      -p, -password            Defines the Active Directory user password. [optional]"
+    Write-Output "[Required]    -d, -domain              Defines the Active Directory domain."
+    Write-Output "[Optional]    -i, -info                Starts Basic Domain Information Enumeration."
+    Write-Output "[Optional]    -b, -basic               Starts searching for basic misconfigurations."
+    Write-Output "[Optional]    -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR."
+    Write-Output "[Optional]    -pndc, -pndc             Checks if the spooler service is running on the domain controllers."
+    Write-Output "[Optional]    -pnou, -pnou             Checks if the spooler service is running on servers in target OU."
+    Write-Output "[Optional]        -sb, -searchbase         Defines ou path for pnou parameter."
+    Write-Output "[Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects."
+    Write-Output "[Optional]        -u, -username            Defines the Active Directory username."
+    Write-Output "[Optional]        -p, -password            Defines the Active Directory user password."
+    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPO's."
     exit
 }
 
@@ -265,4 +274,9 @@ if($pnou) {
 if($dacl) {
     # test ad credentials & if valid -> run custom dacl check
     Test-ADCredentials -Username $userName -Password $password
+}
+
+if($gpo) {
+    # enumerate domain GPO's
+    Test-GPOs
 }
