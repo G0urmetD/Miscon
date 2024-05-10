@@ -14,10 +14,11 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     
 
     Author = G0urmetD
-    version = 1.7.2
+    version = 1.8.1
     
 [INFO] Here is some help ...
-Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo]
+Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
+                                    [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]
 
 Parameters:
 ------------------------------------------------------------------------------------------------------------------
@@ -32,4 +33,6 @@ Parameters:
 [Optional]        -u, -username            Defines the Active Directory username.
 [Optional]        -p, -password            Defines the Active Directory user password.
 [Optional]    -g, -gpo                 Enumerate domain GPO's.
+[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates.
+[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates.
 ```
