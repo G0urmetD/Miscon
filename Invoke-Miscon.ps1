@@ -23,6 +23,14 @@
     [optional] Defines the Active Directory username.
 .PARAMETER password
     [optional] Defines the Active Directory password.
+.PARAMETER GPO
+    [optional] Starts GPO enumeration.
+.PARAMETER domainGPOs
+    [optional] GPO array for GPO enumeration.
+.PARAMETER ADCSTemplates
+    [optional] Enumerates ADCS templates.
+.PARAMETER FineGrained
+    [optional] Enumerates ADCS templates fine grained with more information about the templates.
 #>
 
 param(
@@ -71,7 +79,15 @@ param(
     [switch]$GPO,
 
     [Parameter(HelpMessage = "GPO array.")]
-    [string[]]$domainGPOs
+    [string[]]$domainGPOs,
+
+    [Parameter(HelpMessage = "Enumerates ADCS templates.")]
+    [Alias('adcs')]
+    [switch]$ADCSTemplates,
+
+    [Parameter(HelpMessage = "Enumerates ADCS templates fine grained with more information about the templates.")]
+    [Alias('fg')]
+    [switch]$FineGrained
 )
 
 # import of modules
@@ -83,11 +99,13 @@ Import-Module ".\modules\printNightmare-DC.psm1" -Force
 Import-Module ".\modules\printNightmare-OU.psm1" -Force
 Import-Module ".\modules\domainacls.psm1" -Force
 Import-Module ".\modules\gpo.psm1" -Force
+Import-Module ".\modules\adcs-templates.psm1" -Force
 
 if($help) {
     Show-Banner
     Write-Output "[INFO] Here is some help ..."
-    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-gpo]"
+    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
+                                    [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]"
     Write-Output ""
     Write-Output "Parameters:"
     Write-Output "------------------------------------------------------------------------------------------------------------------"
@@ -101,7 +119,9 @@ if($help) {
     Write-Output "[Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects."
     Write-Output "[Optional]        -u, -username            Defines the Active Directory username."
     Write-Output "[Optional]        -p, -password            Defines the Active Directory user password."
-    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPO's."
+    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPOs."
+    Write-Output "[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates."
+    Write-Output "[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates."
     exit
 }
 
@@ -279,4 +299,16 @@ if($dacl) {
 if($gpo) {
     # enumerate domain GPO's
     Test-GPOs
+}
+
+if($ADCSTemplates) {
+    if(-not($FineGrained)) {
+        Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+        Write-Host " Fetching ADCS templates ..."
+        Get-ADCSTemplate | Format-Table
+    } else {
+        Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+        Write-Host " Fetching fine grained ADCS templates ..."
+        Get-ADCSTemplate
+    }
 }

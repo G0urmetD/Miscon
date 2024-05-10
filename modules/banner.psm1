@@ -7,7 +7,7 @@ function Show-Banner {
     #>
 
     param(
-        [string]$version = "1.7.3"
+        [string]$version = "1.8.1"
     )
 
     Write-Host "
