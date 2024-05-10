@@ -14,7 +14,7 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     
 
     Author = G0urmetD
-    version = 1.8.2
+    version = 1.9.1
     
 [INFO] Here is some help ...
 Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
