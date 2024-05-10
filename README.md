@@ -32,7 +32,7 @@ Parameters:
 [Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects.
 [Optional]        -u, -username            Defines the Active Directory username.
 [Optional]        -p, -password            Defines the Active Directory user password.
-[Optional]    -g, -gpo                 Enumerate domain GPO's.
+[Optional]    -g, -gpo                 Enumerate domain GPOs.
 [Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates.
 [Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates.
 
