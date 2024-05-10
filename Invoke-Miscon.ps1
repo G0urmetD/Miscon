@@ -119,7 +119,7 @@ if($help) {
     Write-Output "[Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects."
     Write-Output "[Optional]        -u, -username            Defines the Active Directory username."
     Write-Output "[Optional]        -p, -password            Defines the Active Directory user password."
-    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPO's."
+    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPOs."
     Write-Output "[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates."
     Write-Output "[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates."
     exit
