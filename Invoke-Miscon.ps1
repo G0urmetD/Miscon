@@ -125,11 +125,31 @@ if($help) {
     exit
 }
 
+# Check if current computer is domain joined
+function Test-DomainJoinStatus {
+    if ((Get-WmiObject Win32_ComputerSystem).PartOfDomain) {
+        return $true
+    } else {
+        return $false
+    }
+}
+
 # checks if at least one parameter was handed over
 if(-not $PSBoundParameters.ContainsKey('domain')) {
     Show-Banner
     Write-Host "[ERROR] The parameter -d/--domain is required. Use -h for further information."
     exit
+} else {
+    # check if domain is reachable
+    $DomainJoined = Test-DomainJoinStatus
+
+    if ($DomainJoined) {
+        Write-Host -ForegroundColor Green "[INFO]" -NoNewline
+        Write-Host " Computer is domain joined to $domain."
+    } elseif (!$DomainJoined) {
+        Write-Host -ForegroundColor Red "[INFO]" -NoNewline
+        Write-Host " Computer is NOT domain joined to $domain."
+    }
 }
 
 Show-Banner
