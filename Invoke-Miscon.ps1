@@ -31,6 +31,8 @@
     [optional] Enumerates ADCS templates.
 .PARAMETER FineGrained
     [optional] Enumerates ADCS templates fine grained with more information about the templates.
+.PARAMETER juicyPorts
+    Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).
 #>
 
 param(
@@ -87,7 +89,11 @@ param(
 
     [Parameter(HelpMessage = "Enumerates ADCS templates fine grained with more information about the templates.")]
     [Alias('fg')]
-    [switch]$FineGrained
+    [switch]$FineGrained,
+
+    [Parameter(HelpMessage = "Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).")]
+    [Alias('jp')]
+    [switch]$juicyPorts
 )
 
 # import of modules
@@ -100,6 +106,7 @@ Import-Module ".\modules\printNightmare-OU.psm1" -Force
 Import-Module ".\modules\domainacls.psm1" -Force
 Import-Module ".\modules\gpo.psm1" -Force
 Import-Module ".\modules\adcs-templates.psm1" -Force
+Import-Module ".\modules\juicy-ports.psm1" -Force
 
 if($help) {
     Show-Banner
@@ -122,6 +129,7 @@ if($help) {
     Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPOs."
     Write-Output "[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates."
     Write-Output "[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates."
+    Write-Output "[Optional]    -jp, -juicyPorts         Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986)."
     exit
 }
 
@@ -355,4 +363,10 @@ if($ADCSTemplates) {
         Write-Host " Fetching fine grained ADCS templates ..."
         Get-ADCSTemplate
     }
+}
+
+if($juicyPorts) {
+    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+    Write-Host " Fetching some computer objects and scan for juicy ports ..."
+    Test-JuicyPorts
 }
