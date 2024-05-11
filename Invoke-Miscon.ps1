@@ -149,6 +149,12 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
     } elseif (!$DomainJoined) {
         Write-Host -ForegroundColor Red "[INFO]" -NoNewline
         Write-Host " Computer is NOT domain joined to $domain."
+        $answer = Read-Host "You wanna anyway start your enumeration? (Y/N)"
+        if(-not ($answer -eq "Y")) {
+            Write-Host -ForegroundColor Red "[INFO]" -NoNewline
+            Write-Host " Exit out, see you again."
+            Exit
+        }
     }
 }
 
