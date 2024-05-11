@@ -10,7 +10,7 @@
 .PARAMETER basic
     [optional] Starts searching for basic misconfigurations.
 .PARAMETER quick
-    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
+    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync.
 .PARAMETER pndc
     [optional] Checks if the spooler service is running on the domain controllers.
 .PARAMETER pnou
@@ -51,7 +51,7 @@ param(
     [Alias('b')]
     [switch]$basic,
 
-    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.")]
+    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync.")]
     [Alias('q')]
     [switch]$quick,
 
