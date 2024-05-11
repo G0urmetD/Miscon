@@ -157,6 +157,7 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
     } elseif (!$DomainJoined) {
         Write-Host -ForegroundColor Red "[INFO]" -NoNewline
         Write-Host " Computer is NOT domain joined to $domain."
+        Exit
     }
 }
 
