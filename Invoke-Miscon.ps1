@@ -320,7 +320,7 @@ if($q -or $quick) {
 
     Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
     Write-Host " Checking for CPassword in xml files on sysvol ..."
-    $cpasswordFindings = findstr /S /I cpassword \\<FQDN>\sysvol\<FQDN>\policies\*.xml
+    $cpasswordFindings = findstr /S /I cpassword \\$domain\sysvol\$domain\policies\*.xml
     if($cpasswordFindings) {
         $cpasswordFindings
     }
