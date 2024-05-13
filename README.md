@@ -19,6 +19,7 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
 [INFO] Here is some help ...
 Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
                                     [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]
+                                        [-jp/-juicyPorts]
 
 Parameters:
 ------------------------------------------------------------------------------------------------------------------
