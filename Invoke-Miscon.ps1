@@ -110,7 +110,8 @@ Import-Module ".\modules\juicy-ports.psm1" -Force
 
 if($help) {
     Show-Banner
-    Write-Output "[INFO] Here is some help ..."
+    Write-Host -ForegroundColor Yellow "[INFO]" -NoNewline
+    Write-Host " Here is some help ..."
     Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
                                     [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]"
     Write-Output ""
@@ -145,7 +146,8 @@ function Test-DomainJoinStatus {
 # checks if at least one parameter was handed over
 if(-not $PSBoundParameters.ContainsKey('domain')) {
     Show-Banner
-    Write-Host "[ERROR] The parameter -d/--domain is required. Use -h for further information."
+    Write-Host -ForegroundColor Red "[ERROR]" -NoNewline
+    Write-Host " The parameter -d/--domain is required. Use -h for further information."
     exit
 } else {
     # check if domain is reachable
