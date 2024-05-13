@@ -163,6 +163,7 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
             Write-Host " Exit out, see you again."
             Exit
         }
+        Exit
     }
 }
 
