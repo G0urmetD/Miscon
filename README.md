@@ -10,14 +10,14 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     | |\/| | / __|/ __/ _ \| '_ \ 
     | |  | | \__ \ (_| (_) | | | |
     \_|  |_/_|___/\___\___/|_| |_|
-    
-    
+
+
 
     Author = G0urmetD
-    version = 1.10.2
-    
+    version = 1.11.3
+
 [INFO] Here is some help ...
-Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
+Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
                                     [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]
 
 Parameters:
@@ -35,6 +35,5 @@ Parameters:
 [Optional]    -g, -gpo                 Enumerate domain GPOs.
 [Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates.
 [Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates.
-
-
+[Optional]    -jp, -juicyPorts         Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).
 ```

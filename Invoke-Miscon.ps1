@@ -10,7 +10,7 @@
 .PARAMETER basic
     [optional] Starts searching for basic misconfigurations.
 .PARAMETER quick
-    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
+    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync/CPasswords.
 .PARAMETER pndc
     [optional] Checks if the spooler service is running on the domain controllers.
 .PARAMETER pnou
@@ -31,6 +31,8 @@
     [optional] Enumerates ADCS templates.
 .PARAMETER FineGrained
     [optional] Enumerates ADCS templates fine grained with more information about the templates.
+.PARAMETER juicyPorts
+    Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).
 #>
 
 param(
@@ -49,7 +51,7 @@ param(
     [Alias('b')]
     [switch]$basic,
 
-    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.")]
+    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync/CPasswords.")]
     [Alias('q')]
     [switch]$quick,
 
@@ -87,7 +89,11 @@ param(
 
     [Parameter(HelpMessage = "Enumerates ADCS templates fine grained with more information about the templates.")]
     [Alias('fg')]
-    [switch]$FineGrained
+    [switch]$FineGrained,
+
+    [Parameter(HelpMessage = "Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).")]
+    [Alias('jp')]
+    [switch]$juicyPorts
 )
 
 # import of modules
@@ -100,6 +106,7 @@ Import-Module ".\modules\printNightmare-OU.psm1" -Force
 Import-Module ".\modules\domainacls.psm1" -Force
 Import-Module ".\modules\gpo.psm1" -Force
 Import-Module ".\modules\adcs-templates.psm1" -Force
+Import-Module ".\modules\juicy-ports.psm1" -Force
 
 if($help) {
     Show-Banner
@@ -112,7 +119,7 @@ if($help) {
     Write-Output "[Required]    -d, -domain              Defines the Active Directory domain."
     Write-Output "[Optional]    -i, -info                Starts Basic Domain Information Enumeration."
     Write-Output "[Optional]    -b, -basic               Starts searching for basic misconfigurations."
-    Write-Output "[Optional]    -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR."
+    Write-Output "[Optional]    -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/CPasswords."
     Write-Output "[Optional]    -pndc, -pndc             Checks if the spooler service is running on the domain controllers."
     Write-Output "[Optional]    -pnou, -pnou             Checks if the spooler service is running on servers in target OU."
     Write-Output "[Optional]        -sb, -searchbase         Defines ou path for pnou parameter."
@@ -122,6 +129,7 @@ if($help) {
     Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPOs."
     Write-Output "[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates."
     Write-Output "[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates."
+    Write-Output "[Optional]    -jp, -juicyPorts         Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986)."
     exit
 }
 
@@ -149,6 +157,12 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
     } elseif (!$DomainJoined) {
         Write-Host -ForegroundColor Red "[INFO]" -NoNewline
         Write-Host " Computer is NOT domain joined to $domain."
+        $answer = Read-Host "You wanna anyway start your enumeration? (Y/N)"
+        if(-not ($answer -eq "Y")) {
+            Write-Host -ForegroundColor Red "[INFO]" -NoNewline
+            Write-Host " Exit out, see you again."
+            Exit
+        }
         Exit
     }
 }
@@ -309,6 +323,13 @@ if($q -or $quick) {
     $dcsyncCheck = Test-DCSync
     $dcsyncCheck
     Write-Output ""
+
+    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
+    Write-Host " Checking for CPassword in xml files on sysvol ..."
+    $cpasswordFindings = findstr /S /I cpassword \\$domain\sysvol\$domain\policies\*.xml
+    if($cpasswordFindings) {
+        $cpasswordFindings
+    }
 }
 
 if($pndc) {
@@ -356,4 +377,10 @@ if($ADCSTemplates) {
         Write-Host " Fetching fine grained ADCS templates ..."
         Get-ADCSTemplate
     }
+}
+
+if($juicyPorts) {
+    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
+    Write-Host " Fetching some computer objects and scan for juicy ports ..."
+    Test-JuicyPorts
 }

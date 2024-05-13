@@ -1,5 +1,3 @@
-#requires -Modules GroupPolicy
-
 function Get-GPOWmiFilter {
     <#
     .Synopsis
