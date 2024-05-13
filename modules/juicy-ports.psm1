@@ -12,11 +12,6 @@ function Test-JuicyPorts {
 
     $results = @()
 
-    Write-Host -ForegroundColor Yellow "[INFO]" -NoNewline
-    Write-Host " Fetching computer objects out of the domain."
-    Write-Host -ForegroundColor Yellow "[INFO]" -NoNewline
-    Write-Host " Scan for juicy ports."
-
     foreach ($computer in $computers) {
         $computerName = $computer.Name
         $ipAddress = [System.Net.Dns]::GetHostAddresses($computerName) | Where-Object { $_.AddressFamily -eq "InterNetwork" } | Select-Object -ExpandProperty IPAddressToString
