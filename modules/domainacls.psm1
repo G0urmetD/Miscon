@@ -46,7 +46,7 @@ function Test-ADCredentials {
     )
 
     try {
-        # Versuche, eine Verbindung zum Active Directory herzustellen
+        # try to create a connection to active directory
         $null = Get-ADUser -Filter * -Credential (New-Object System.Management.Automation.PSCredential($Username, (ConvertTo-SecureString $Password -AsPlainText -Force))) -ErrorAction Stop
         Write-Host -ForegroundColor Green "[VALID]" -NoNewline
         Write-Host " Credentials are valid ..."
