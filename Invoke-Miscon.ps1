@@ -1,146 +1,166 @@
 <#
 .DESCRIPTION
-    The Miscon tool can identify basic misconfigurations and quick wins from an IT security perspective.
-.PARAMETER help
-    [optional] Shows the help for young padawans.
-.PARAMETER domain
-    [required] Defines the Active Directory domain.
-.PARAMETER info
-    [optional] Starts Basic Domain Information Enumeration.
-.PARAMETER basic
-    [optional] Starts searching for basic misconfigurations.
-.PARAMETER quick
-    [optional] Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync/CPasswords.
-.PARAMETER pndc
-    [optional] Checks if the spooler service is running on the domain controllers.
-.PARAMETER pnou
-    [optional] Checks if the spooler service is running on servers in target OU.
-.PARAMETER searchbase
-    [optional] Defines ou path for pnou parameter.
-.PARAMETER dacl
-    [optional] Checks for custom domain acls.
-.PARAMETER username
-    [optional] Defines the Active Directory username.
-.PARAMETER password
-    [optional] Defines the Active Directory password.
-.PARAMETER GPO
-    [optional] Starts GPO enumeration.
-.PARAMETER domainGPOs
-    [optional] GPO array for GPO enumeration.
-.PARAMETER ADCSTemplates
-    [optional] Enumerates ADCS templates.
-.PARAMETER FineGrained
-    [optional] Enumerates ADCS templates fine grained with more information about the templates.
-.PARAMETER juicyPorts
-    Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).
+    MisconPE is a tool to find misconfigurations, information or vulnerabilities in an Active Directory.
 #>
 
 param(
-    [Parameter(HelpMessage = "Shows the help for young padawans.")]    
+    [Parameter(HelpMessage = "Shows some help for young padawans.")]
+    [Alias('h')]
     [switch]$help,
 
-    [Parameter(HelpMessage = "Defines the Active Directory domain.")]
+    [Parameter(HelpMessage = "Defines the target domain.")]
     [Alias('d')]
     [string]$domain,
 
-    [Parameter(HelpMessage = "Starts Basic Domain Information Enumeration.")]
+    [Parameter(HelpMessage = "Run all checks of the tool.")]
+    [switch]$all,
+
+    [Parameter(HelpMessage = "Run quickwins checks.")]
+    [switch]$quickwins,
+
+    [Parameter(HelpMessage = "Shows domain information.")]
     [Alias('i')]
     [switch]$info,
 
-    [Parameter(HelpMessage = "Starts searching for basic misconfigurations.")]
+    [Parameter(HelpMessage = "Shows domain information.")]
     [Alias('b')]
     [switch]$basic,
 
-    [Parameter(HelpMessage = "Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/DCSync/CPasswords.")]
-    [Alias('q')]
-    [switch]$quick,
+    [Parameter(HelpMessage = "Scans for kerberoastable accounts in the domain.")]
+    [switch]$kerberoast,
 
-    [Parameter(HelpMessage = "Checks if the spooler service is running on the domain controllers.")]
-    [switch]$pndc,
+    [Parameter(HelpMessage = "Scans for asrep roastable accounts in the domain.")]
+    [switch]$asrep,
 
-    [Parameter(HelpMessage = "Checks if the spooler service is running on servers in target OU.")]
-    [switch]$pnou,
+    [Parameter(HelpMessage = "Scans for dcsync privileges.")]
+    [switch]$dcsync,
 
-    [Parameter(HelpMessage = "Defines ou path for pnou parameter.")]
-    [Alias('sb')]
-    [switch]$searchbase,
+    [Parameter(HelpMessage = "Check if LLMNR is activated in the domain.")]
+    [switch]$llmnr,
 
     [Parameter(HelpMessage = "Checks for custom domain acls on not built-in objects.")]
-    [switch]$dacl,
+    [Alias('dacl')]
+    [switch]$domainACL,
 
-    [Parameter(HelpMessage = "Defines the Active Directory username.")]
+    [Parameter(HelpMessage = "Defines the username, necessary for some checks.")]
     [Alias('u')]
     [string]$username,
 
-    [Parameter(HelpMessage = "Defines the Active Directory password.")]
+    [Parameter(HelpMessage = "Defines the password.")]
     [Alias('p')]
     [string]$password,
 
-    [Parameter(HelpMessage = "Starts GPO enumeration.")]
-    [Alias('g')]
-    [switch]$GPO,
-
-    [Parameter(HelpMessage = "GPO array.")]
-    [string[]]$domainGPOs,
+    [Parameter(HelpMessage = "Enumerate domain GPOs.")]
+    [Alias('gpo')]
+    [switch]$groupPolicy,
 
     [Parameter(HelpMessage = "Enumerates ADCS templates.")]
     [Alias('adcs')]
-    [switch]$ADCSTemplates,
+    [switch]$adcsTemplates,
 
-    [Parameter(HelpMessage = "Enumerates ADCS templates fine grained with more information about the templates.")]
-    [Alias('fg')]
-    [switch]$FineGrained,
+        [Parameter(HelpMessage = "Enumerates ADCS templates fine grained with more information about the templates.")]
+        [Alias('fg')]
+        [switch]$fineGrained,
 
-    [Parameter(HelpMessage = "Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).")]
+    [Parameter(HelpMessage = "Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986, 80, 443, 8080, 8443, 22, 2222, 1433).")]
     [Alias('jp')]
-    [switch]$juicyPorts
+    [switch]$juicyPorts,
+
+    [Parameter(HelpMessage = "Checks if the spooler service is running on servers in target OU.")]
+    [Alias('pnou')]
+    [switch]$printNighmareOU,
+
+        [Parameter(HelpMessage = "Defines the ou path for pnou parameter.")]
+        [Alias('sb')]
+        [switch]$searchBase,
+
+    [Parameter(HelpMessage = "Checks if the spooler service is running domain controllers.")]
+    [Alias('pndc')]
+    [switch]$printNighmareDC
 )
 
-# import of modules
-Import-Module ".\modules\banner.psm1" -Force
-Import-Module ".\modules\domainInfo.psm1" -Force
-Import-Module ".\modules\basic-misconfigurations.psm1" -Force
-Import-Module ".\modules\quickwins.psm1" -Force
-Import-Module ".\modules\printNightmare-DC.psm1" -Force
-Import-Module ".\modules\printNightmare-OU.psm1" -Force
-Import-Module ".\modules\domainacls.psm1" -Force
-Import-Module ".\modules\gpo.psm1" -Force
-Import-Module ".\modules\adcs-templates.psm1" -Force
-Import-Module ".\modules\juicy-ports.psm1" -Force
+function Show-Banner {
+    <#
+    .DESCRIPTION
+        Tool Banner.
+    .PARAMETER version
+        Defines the tool version.
+    #>
+
+    param(
+        [Parameter(HelpMessage = "Defines the tool version.")]
+        [string]$version = "1.0"
+    )
+
+    Write-Host "
+    
+    ___  ____                     
+    |  \/  (_)                    
+    | .  . |_ ___  ___ ___  _ __  
+    | |\/| | / __|/ __/ _ \| '_ \ 
+    | |  | | \__ \ (_| (_) | | | |
+    \_|  |_/_|___/\___\___/|_| |_|
+
+    " -ForegroundColor DarkMagenta
+    Write-Output "
+        Author:     G0urmetD
+        Version:    $version
+    "
+}
 
 if($help) {
     Show-Banner
-    Write-Host -ForegroundColor Yellow "[INFO]" -NoNewline
-    Write-Host " Here is some help ..."
-    Write-Output "Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick] 
-                                    [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]"
-    Write-Output ""
-    Write-Output "Parameters:"
-    Write-Output "------------------------------------------------------------------------------------------------------------------"
-    Write-Output "[Required]    -d, -domain              Defines the Active Directory domain."
-    Write-Output "[Optional]    -i, -info                Starts Basic Domain Information Enumeration."
-    Write-Output "[Optional]    -b, -basic               Starts searching for basic misconfigurations."
-    Write-Output "[Optional]    -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR/CPasswords."
-    Write-Output "[Optional]    -pndc, -pndc             Checks if the spooler service is running on the domain controllers."
-    Write-Output "[Optional]    -pnou, -pnou             Checks if the spooler service is running on servers in target OU."
-    Write-Output "[Optional]        -sb, -searchbase         Defines ou path for pnou parameter."
-    Write-Output "[Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects."
-    Write-Output "[Optional]        -u, -username            Defines the Active Directory username."
-    Write-Output "[Optional]        -p, -password            Defines the Active Directory user password."
-    Write-Output "[Optional]    -g, -gpo                 Enumerate domain GPOs."
-    Write-Output "[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates."
-    Write-Output "[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates."
-    Write-Output "[Optional]    -jp, -juicyPorts         Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986)."
+    
+    Write-Host "======================================== { Description } ============================================="
+    Write-Output "MisconPE is a tool to find misconfigurations, information or vulnerabilities in an Active Directory."
+    Write-Host "======================================== { Parameters } =============================================="
+    Write-Output "
+        -h, -help                   Show help function.
+        -d, --domain                Defines the target domain.
+
+        -u, --username              Defines the username, necessary for some checks.
+        -p, --password              Defines the password. [SecureString]
+
+        -all                        Run all checks of the tool.
+        -quickwins                  Run quickwins checks.
+        -i, --info                  Shows Domain information.
+        -b, --basic                 Run basic misconfiguration checks.
+
+        -kerberoast                 Scans for kerberoastable accounts in the domain.
+        -asrep                      Scans for asrep roastable accounts in the domain.
+        -dcsync                     Scans for dcsync privileges.
+        -llmnr                      Check if LLMNR is activated in the domain.
+
+        -dacl, --domainACL          Checks for custom domain acls on not built-in objects.
+        -gpo, --groupPolicy         Enumerate domain GPOs.
+        -adcs, --adcsTemplates      Enumerates ADCS tempaltes.
+            -fg, --faineGrained         Enumerates ADCS templates fine grained with more information about the templates.
+        -jp, --juicyPorts           Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986, 80, 443, 8080, 8443, 22, 2222, 1433).
+        -pnou, --printNightmareOU   Checks if the spooler service is running on servers in target OU.
+            -sb, --searchBase           Defines ou path for pnou parameter.
+        -pndc, --printNightmareDC   Checks if the spooler service is running domain controllers. [Username & Password required]
+    "
     exit
 }
 
 # Check if current computer is domain joined
 function Test-DomainJoinStatus {
     if ((Get-WmiObject Win32_ComputerSystem).PartOfDomain) {
-        return $true
+        Write-Host -ForegroundColor DarkMagenta "[INFO]" -NoNewline
+        Write-Host " Current computer is part of a domain, proceed ..."
     } else {
-        return $false
+        Write-Host -ForegroundColor RED "[ERROR]" -NoNewline
+        Write-Host " Current computer is NOT part of a domain, exit ..."
+        exit
     }
+}
+
+function ImportModules {
+    # import of modules
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Importing the modules ..."
+    $modulePath = ".\modules"
+    Get-ChildItem -Path $modulePath -Filter *.psm1 | ForEach-Object { Import-Module -Name $_.FullName -Force }
 }
 
 # checks if at least one parameter was handed over
@@ -156,220 +176,158 @@ if(-not $PSBoundParameters.ContainsKey('domain')) {
     if ($DomainJoined) {
         Write-Host -ForegroundColor Green "[INFO]" -NoNewline
         Write-Host " Computer is domain joined to $domain."
+        # import modules
+        ImportModules
     } elseif (!$DomainJoined) {
         Write-Host -ForegroundColor Red "[INFO]" -NoNewline
         Write-Host " Computer is NOT domain joined to $domain."
-        $answer = Read-Host "You wanna anyway start your enumeration? (Y/N)"
-        if(-not ($answer -eq "Y")) {
-            Write-Host -ForegroundColor Red "[INFO]" -NoNewline
-            Write-Host " Exit out, see you again."
-            Exit
-        }
-        Exit
     }
 }
 
-Show-Banner
-
-if($i -or $info) {
-    # call domainInfo function from domainInfo module
+if($all) {
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Fetching Domain information ..."
-    $domainInfo = Get-DomainInfo
-    # show DomainInfo Output
-    Write-Output "Domain Name:                      $($domainInfo.DomainName)"
-    Write-Output "Domain Controller:                $($domainInfo.DomainController)"
-    Write-Output "Domain Functional Level:          $($domainInfo.DomainFunctionalLevel)"
-    Write-Output "Forest Functional Level:          $($domainInfo.ForestFunctionalLevel)"
-    Write-Output "Domain Controllers:               $($domainInfo.DomainControllers -join ', ')"
-    Write-Output "Sites:                            $($domainInfo.Sites -join ', ')"
-    Write-Output "Number of Sites:                  $($domainInfo.SitesCount)"
-    Write-Output "Domain Administrators:            $($domainInfo.DomainAdmins -join ', ')"
-    Write-Output "Number of Domain Administrators:  $($domainInfo.DomainAdminsCount)"
-    Write-Output "Number of Users:                  $($domainInfo.UsersCount)"
-    Write-Output "Number of Computers:              $($domainInfo.ComputersCount)"
-    Write-Output ""
+    Write-Host " Run all checks..."
+
+    Write-Host "========================= { Domain Information } =========================" -ForegroundColor Blue
+    Write-Host "========================= { Domain Information" -ForegroundColor Blue
+    Get-DomainInfo
+
+    Write-Host "========================= { Quick Wins } =========================" -ForegroundColor Blue
+    Write-Host "========================= { Kerberoastable Accounts" -ForegroundColor Blue
+    Test-KerberoastableAccounts
+    Write-Host ""
+    Write-Host "========================= { ASREP Roastable Accounts" -ForegroundColor Blue
+    Test-ASREPRoasting
+    Write-Host ""
+    Write-Host "========================= { DCSync" -ForegroundColor Blue
+    Test-DCSync
+    Write-Host ""
+    Write-Host "========================= { LLMNR" -ForegroundColor Blue
+    Test-LLMNR
 }
 
-if($b -or $basic) {
-    # call Test-DefaultDomainPasswordPolicy function from basic-misconfigurations module
+if($basic) {
     Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Searching for basic misconfigurations ..."
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Testing default domain policy ..."
-    $result = Test-DefaultDomainPasswordPolicy
-    # show Test-DefaultDomainPasswordPolicy Output
-    if($result.ComplexityEnabled -eq $False) {
-        Write-Host "ComplexityEnabled:                $($result.ComplexityEnabled)" -ForegroundColor Red
-    } else {
-        Write-Output "ComplexityEnabled:                $($result.ComplexityEnabled)"
-    }
-    if($result.MinPasswordLength -lt 10) {
-        Write-Host "MinPasswordLength:                $($result.MinPasswordLength)" -ForegroundColor Red
-    } else {
-        Write-Output "MinPasswordLength:              $($result.MinPasswordLength)"
-    }
-    Write-Output "MaxPasswordLength:                $($result.MaxPasswordLength)"
-    Write-Output "MinPasswordAge:                   $($result.MinPasswordAge)"
-    Write-Output "MaxPasswordAge:                   $($result.MaxPasswordAge)"
-    if($result.PasswordHistoryCount -lt 15) {
-        Write-Host "PasswordHistoryCount:             $($result.PasswordHistoryCount)" -ForegroundColor Red
-    } else {
-        Write-Output "PasswordHistoryCount:             $($result.PasswordHistoryCount)"
-    }
-    Write-Output "Lockout Treshold:                 $($result.LockoutTreshold)"
-    Write-Output "Lockout Observation window:       $($result.LockoutObservationWindow)"
-    Write-Output "Lockout duration:                 $($result.LockoutDuration)"
-    Write-Output ""
+    Write-Host " Run basic misconfiguration checks..."
+    Write-Host "========================= { Basic Misconfigurations } =========================" -ForegroundColor Blue
+    Write-Host "========================= { Domain Information" -ForegroundColor Blue
+    Get-DomainInfo
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Searching for disabled accounts ..."
-    $disabledAccounts = Test-DisabledAccounts
-    $disabledAccounts
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Domain Password Policy" -ForegroundColor Blue
+    Test-DefaultDomainPasswordPolicy
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Searching for machine account Quota = ms-DS-MachineAccountQuota ..."
-    $machineAccountQuota = Test-MachineAccountQuota
-    Write-Output "DistinguishedName:                $($machineAccountQuota.DistinguishedName)"
-    Write-Output "ms-DS-MachineAccountQuota:        $($machineAccountQuota.'ms-DS-MachineAccountQuota')"
-    Write-Output "Name:                             $($machineAccountQuota.Name)"
-    Write-Output "ObjectClass:                      $($machineAccountQuota.ObjectClass)"
-    Write-Output "ObjectGUID:                       $($machineAccountQuota.ObjectGUID)"
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Disabled Domain Accounts" -ForegroundColor Blue
+    Test-DisabledAccounts
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Check when krbtgt password last set ..."
-    $krbtgtpwlastSet = Test-KRBTGTPWLastSet
-    $krbtgtpwlastSet
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { MachineAccountQuota" -ForegroundColor Blue
+    Test-MachineAccountQuota
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Check when AD administrator password last set ..."
-    $ADAdministratorPWLastSet = Test-ADAdministrator
-    $ADAdministratorPWLastSet
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { KRBTGT Password Last Set" -ForegroundColor Blue
+    Test-KRBTGTPWLastSet
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Search for users with constrained delegation."
-    $testconstrainedDelegation = Test-ConstrainedDelegation
-    if(-not ($testconstrainedDelegation)) {
-        Write-Host -ForegroundColor Red "[SAD]" -NoNewline
-        Write-Host " Could not found users with constrained delegation."
-    } else {
-        Write-Host -ForegroundColor Green "[FOUND]" -NoNewline
-        Write-Host " Search process was successful."
-        Write-Host -ForegroundColor Cyan "[NOTE]" -NoNewline
-        Write-Host " A user or a service can pass on the Kerberos ticket of a client to another service without any restrictions."
-        $testconstrainedDelegation
-    }
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { AD Administrator Information" -ForegroundColor Blue
+    Test-ADAdministrator
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Search for users with unconstrained delegation."
-    $testunconstrainedDelegation = Test-UnconstrainedDelegation
-    if(-not ($testunconstrainedDelegation)) {
-        Write-Host -ForegroundColor Red "[SAD]" -NoNewline
-        Write-Host " Could not found users with unconstrained delegation."
-    } else {
-        Write-Host -ForegroundColor Green "[FOUND]" -NoNewline
-        Write-Host " Search process was successful."
-        Write-Host -ForegroundColor Cyan "[NOTE]" -NoNewline
-        Write-Host " Delegation is restricted to certain services or resources to which a user or service may have access.."
-        $testunconstrainedDelegation
-    }
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Constrained Delegation" -ForegroundColor Blue
+    Test-ConstrainedDelegation
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Checking if users have admincount greater than 0 and Kerberos Delegation activated ..."
-    $admincount = Test-AdminDelegation
-    $admincount | Format-Table
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Unconstrained Delegation" -ForegroundColor Blue
+    Test-UnconstrainedDelegation
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Never changing a bad password is bad for the whole Domain, especially Service Accounts. ..."
-    $pwNeverExpires = Test-PWNeverExpires
-    $pwNeverExpires | Format-Table
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Admin Delegation" -ForegroundColor Blue
+    Test-AdminDelegation
 
-    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
-    Write-Host " Checking Security group members ..."
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Some groups should be empty ..."
-    $securityGroups = Test-SecurityGroups
-    $securityGroups | Format-Table
-    Write-Output ""
+    Write-Host ""
+    Write-Host "========================= { Accounts with Password Never Expires" -ForegroundColor Blue
+    Test-PWNeverExpires
+
+    Write-Host ""
+    Write-Host "========================= { Domain Security Groups" -ForegroundColor Blue
+    Test-SecurityGroups
 }
 
-if($q -or $quick) {
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Checking for AS-REP Roasting ..."
-    $ASREPROASTING = Test-ASREPRoasting
-    $ASREPROASTING | Format-Table
-    Write-Output ""
+if($kerberoast) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Scanning for kerberoastable accounts in the domain..."
+    Write-Host "========================= { Kerberoastable Accounts" -ForegroundColor Blue
+    Test-KerberoastableAccounts
+}
 
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Checking for AS-REP Roasting ..."
-    $kerberoastableAccounts = Test-KerberoastableAccounts
-    $kerberoastableAccounts | Format-Table
-    Write-Output ""
+if($asrep) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Scanning for asrep roastable accounts in the domain..."
+    Write-Host "========================= { ASREP Roastable Accounts" -ForegroundColor Blue
+    Test-ASREPRoasting
+}
 
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Checking for LLMNR ..."
-    $llmnrCheck = Test-LLMNR
-    $llmnrCheck | Format-Table
-    Write-Output ""
+if($dcsync) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Scans for dcsync privileges..."
+    Write-Host "========================= { DCSync" -ForegroundColor Blue
+    Test-DCSync
+}
 
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Checking for DCSync rights ..."
-    $dcsyncCheck = Test-DCSync
-    $dcsyncCheck
-    Write-Output ""
+if($llmnr) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Check if LLMNR is activated in the domain..."
+    Write-Host "========================= { LLMNR" -ForegroundColor Blue
+    Test-LLMNR
+}
 
-    Write-Host -ForegroundColor MAGENTA "[INFO]" -NoNewline
-    Write-Host " Checking for CPassword in xml files on sysvol ..."
-    $cpasswordFindings = findstr /S /I cpassword \\$domain\sysvol\$domain\policies\*.xml
-    if($cpasswordFindings) {
-        $cpasswordFindings
+if($quickwins) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Run quickwins checks..."
+
+    Write-Host "========================= { Quick Wins } =========================" -ForegroundColor Blue
+    Write-Host "========================= { Kerberoastable Accounts" -ForegroundColor Blue
+    Test-KerberoastableAccounts
+    Write-Host ""
+    Write-Host "========================= { ASREP Roastable Accounts" -ForegroundColor Blue
+    Test-ASREPRoasting
+    Write-Host ""
+    Write-Host "========================= { DCSync" -ForegroundColor Blue
+    Test-DCSync
+    Write-Host ""
+    Write-Host "========================= { LLMNR" -ForegroundColor Blue
+    Test-LLMNR
+}
+
+if($info) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Show domain information..."
+    Write-Host "========================= { Domain Information } =========================" -ForegroundColor Blue
+    Write-Host "========================= { Domain Information" -ForegroundColor Blue
+    Get-DomainInfo
+}
+
+if($domainACL) {
+    if($username -ne $null -AND $password -ne $null) {
+        Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+        Write-Host " Checks for custom domain acls on not built-in objects..."
+        Write-Host "========================= { Domain ACLs" -ForegroundColor Blue
+        Test-ADCredentials -Username $userName -Password $password
     }
 }
 
-if($pndc) {
-    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
-    Write-Host " Checks if the spooler service is running on the domain controllers ..."
-    $PrintNightmareDC = Test-PrintNightmareDC
-    $PrintNightmareDC | Format-Table
-
-    if($PrintNightmareDC.State -eq "Running") {
-        Write-Host -ForegroundColor Red "[VULNERABLE]" -NoNewline
-        Write-Host " Your domain controller is vulnerable, spooler service is running ..."
-    }
-    Write-Output ""
-}
-
-if($pnou) {
-    if(-not ($searchbase -or $sb)) {
-        Write-Host -ForegroundColor Red "[ERROR]" -NoNewline
-        Write-Host " The -sb/-searchbase parameter is required when using -pnou. Use -h for further information. ..."
-    } else {
-        Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
-        Write-Host " Checks if the spooler service is running on servers in target OU ..."
-        Test-PrintNightmareOU | Format-Table
-        Write-Output ""
-    }
-}
-
-if($dacl) {
-    # test ad credentials & if valid -> run custom dacl check
-    Test-ADCredentials -Username $userName -Password $password
-}
-
-if($gpo) {
-    # enumerate domain GPO's
+if($groupPolicy) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Enumerate domain GPOs..."
+    Write-Host "========================= { Domain Group Policies" -ForegroundColor Blue
     Test-GPOs
 }
 
-if($ADCSTemplates) {
+if($adcsTemplates) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Enumerate ADCS templates..."
+    Write-Host "========================= { ADCS templates" -ForegroundColor Blue
     if(-not($FineGrained)) {
         Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
         Write-Host " Fetching ADCS templates ..."
@@ -382,7 +340,40 @@ if($ADCSTemplates) {
 }
 
 if($juicyPorts) {
-    Write-Host -ForegroundColor Cyan "[INFO]" -NoNewline
-    Write-Host " Fetching some computer objects and scan for juicy ports ..."
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Let's find some juicy ports..."
+    Write-Host "========================= { Juicy Ports" -ForegroundColor Blue
     Test-JuicyPorts
+}
+
+if($pnou) {
+    if(-not ($searchbase -or $sb)) {
+        Write-Host -ForegroundColor Red "[ERROR]" -NoNewline
+        Write-Host " The -sb/-searchbase parameter is required when using -pnou. Use -h for further information. ..."
+    } else {
+        Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+        Write-Host " Looking for running spooler service..."
+        Write-Host "========================= { PrintNightmare" -ForegroundColor Blue
+        Test-PrintNightmareOU
+    }
+}
+
+if ($pndc) {
+    Write-Host -ForegroundColor YELLOW "[INFO]" -NoNewline
+    Write-Host " Looking for running spooler service on domain controllers..."
+    Write-Host "========================= { PrintNightmare" -ForegroundColor Blue
+
+    if (-not $username -or -not $password) {
+        Write-Host -ForegroundColor RED "[ERROR]" -NoNewline
+        Write-Host " Username and password are required."
+        exit
+    }
+
+    $PrintNightmareDC = Test-PrintNightmareDC -Username $username -Password (ConvertFrom-SecureString -SecureString $password -AsPlainText)
+    $PrintNightmareDC | Format-Table
+
+    if ($PrintNightmareDC.State -eq "Running") {
+        Write-Host -ForegroundColor Red "[VULNERABLE]" -NoNewline
+        Write-Host " Your domain controller is vulnerable, spooler service is running ..."
+    }
 }
