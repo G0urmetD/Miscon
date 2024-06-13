@@ -11,30 +11,37 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     | |  | | \__ \ (_| (_) | | | |
     \_|  |_/_|___/\___\___/|_| |_|
 
+    
 
+        Author:     G0urmetD
+        Version:    1.0
+    
+======================================== { Description } =============================================
+MisconPE is a tool to find misconfigurations, information or vulnerabilities in an Active Directory.
+======================================== { Parameters } ==============================================
 
-    Author = G0urmetD
-    version = 1.11.3
+        -h, -help                   Show help function.
+        -d, --domain                Defines the target domain.
 
-[INFO] Here is some help ...
-Usage: Miscon.ps1 -d <domain> [-u/-username <username>] [-p/-password <password>] [-h] [-i/-info] [-b/-basic] [-q/-quick]
-                                    [-pndc] [-pnou -sb <searchbase>] [-dacl -u <username> -p <password>] [-g/-gpo] [-adcs/-ADCSTemplates -fg/-FineGrained]
-                                        [-jp/-juicyPorts]
+        -u, --username              Defines the username, necessary for some checks.
+        -p, --password              Defines the password. [SecureString]
 
-Parameters:
-------------------------------------------------------------------------------------------------------------------
-[Required]    -d, -domain              Defines the Active Directory domain.
-[Optional]    -i, -info                Starts Basic Domain Information Enumeration.
-[Optional]    -b, -basic               Starts searching for basic misconfigurations.
-[Optional]    -q, -quick               Starts searching for quickwins like AS-REP Roasting/Kerberoastable Accounts/LLMNR.
-[Optional]    -pndc, -pndc             Checks if the spooler service is running on the domain controllers.
-[Optional]    -pnou, -pnou             Checks if the spooler service is running on servers in target OU.
-[Optional]        -sb, -searchbase         Defines ou path for pnou parameter.
-[Optional]    -dacl, -dacl             Checks for custom domain acls on not built-in objects.
-[Optional]        -u, -username            Defines the Active Directory username.
-[Optional]        -p, -password            Defines the Active Directory user password.
-[Optional]    -g, -gpo                 Enumerate domain GPOs.
-[Optional]    -adcs, -ADCSTemplates    Enumerates ADCS templates.
-[Optional]        -fg, -FineGrained        Enumerates ADCS templates fine grained with more information about the templates.
-[Optional]    -jp, -juicyPorts         Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986).
+        -all                        Run all checks of the tool.
+        -quickwins                  Run quickwins checks.
+        -i, --info                  Shows Domain information.
+        -b, --basic                 Run basic misconfiguration checks.
+
+        -kerberoast                 Scans for kerberoastable accounts in the domain.
+        -asrep                      Scans for asrep roastable accounts in the domain.
+        -dcsync                     Scans for dcsync privileges.
+        -llmnr                      Check if LLMNR is activated in the domain.
+
+        -dacl, --domainACL          Checks for custom domain acls on not built-in objects.
+        -gpo, --groupPolicy         Enumerate domain GPOs.
+        -adcs, --adcsTemplates      Enumerates ADCS tempaltes.
+            -fg, --faineGrained         Enumerates ADCS templates fine grained with more information about the templates.
+        -jp, --juicyPorts           Fetch computer objects out of active directory and scan for juicy ports (3389, 5985, 5986, 80, 443, 8080, 8443, 22, 2222, 1433).
+        -pnou, --printNightmareOU   Checks if the spooler service is running on servers in target OU.
+            -sb, --searchBase           Defines ou path for pnou parameter.
+        -pndc, --printNightmareDC   Checks if the spooler service is running domain controllers. [Username & Password required]
 ```
