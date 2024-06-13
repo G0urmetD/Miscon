@@ -45,3 +45,6 @@ MisconPE is a tool to find misconfigurations, information or vulnerabilities in 
             -sb, --searchBase           Defines ou path for pnou parameter.
         -pndc, --printNightmareDC   Checks if the spooler service is running domain controllers. [Username & Password required]
 ```
+
+## Information
+<p>A lot of stuff in the tool is content from PayloadAllTheThings (https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md).</p>
