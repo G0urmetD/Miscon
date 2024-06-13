@@ -14,7 +14,7 @@ Modular PowerShell Tool to display domain information, find basic & advanced mis
     
 
         Author:     G0urmetD
-        Version:    1.0
+        Version:    2.0
     
 ======================================== { Description } =============================================
 MisconPE is a tool to find misconfigurations, information or vulnerabilities in an Active Directory.
