@@ -89,7 +89,7 @@ function Show-Banner {
 
     param(
         [Parameter(HelpMessage = "Defines the tool version.")]
-        [string]$version = "1.0"
+        [string]$version = "2.0"
     )
 
     Write-Host "
